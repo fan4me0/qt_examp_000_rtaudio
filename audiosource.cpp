@@ -16,7 +16,6 @@
 unsigned int dbg_callback_counter = 0;
 static int signal_iter = 0;
 static QVector<QPointF>    m_qpoint_signal(AUDIO_DEV_BUFFER_FRAMES_NBR);
-static volatile bool lock_fill = false;
 
 std::mutex foo, boo;
 
@@ -144,9 +143,7 @@ void audioSource::fillSignal( QVector<QPointF> & vector )
 {
     std::lock (foo, boo);
 
-    //::lock_fill = true;
     vector = ::m_qpoint_signal;
-    //::lock_fill = false;
     foo.unlock();
     boo.unlock();
     signal_iter = 0;

@@ -1,5 +1,5 @@
-#ifndef QT_SPECTRA_PARAM_H
-#define QT_SPECTRA_PARAM_H
+#ifndef QT_GLOBAL_PARAM_H
+#define QT_GLOBAL_PARAM_H
 
 //----------------------------------------------------------------------------------------------
 // Parameters for audioSource.cpp
@@ -21,11 +21,19 @@ typedef double  MY_TYPE;
 
 #define AUDIO_DEV_SAMPLING_FREQ             44100UL
 
+#if defined(__LINUX_PULSE__)
+#define AUDIO_SERVER    "__LINUX_PULSE__"
+#define LIBS_USED       "-lpulse-simple -lpulse"
+#else
+#if defined(__UNIX_JACK__)
+#define AUDIO_SERVER    __UNIX_JACK__
+#define LIBS_USED  =  "-lasound -ljack";
+#else
+#if defined(__LINUX_ALSA__)
+#define AUDIO_SERVER    __LINUX_ALSA__
+#define LIBS_USED =   "-lasound";
+#endif  // defined(__LINUX_ALSA__)
+#endif  // defined(__UNIX_JACK__)
+#endif  // defined(__LINUX_PULSE__)
 
-//----------------------------------------------------------------------------------------------
-// Parameters for dataFft.cpp
-//----------------------------------------------------------------------------------------------
-
-#define DATA_FFT_FFT_SIZE           1000 //44100
-
-#endif // QT_SPECTRA_PARAM_H
+#endif // QT_GLOBAL_PARAM_H

@@ -4,6 +4,7 @@
 // Qt includes
 #include <qlayout.h>
 #include <QPushButton>
+#include <QMenuBar>
 
 // Qwt includes
 #include <qwt_plot_grid.h>
@@ -27,6 +28,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(5);
     layout->setMargin(15);
+
+    createActions();
+    createMenus();
 
     //------------buttons----------------------------
     QHBoxLayout * hLoutOptionButtons = new QHBoxLayout( );
@@ -62,7 +66,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_main_plot = new QwtPlot(text, parent);
     m_main_plot->setCanvasBackground(QColor( Qt::black ));
     m_main_plot->setAxisScale( QwtPlot::xBottom, 0, AUDIO_DEV_BUFFER_FRAMES_NBR - 1 );
-    m_main_plot->setAxisTitle( QwtPlot::xBottom, "signal points [-]" );
+
+    const double sampleTime = 1000.0 / AUDIO_DEV_SAMPLING_FREQ;
+    QString s = "samples [ 1 smpl/" + QString::number(sampleTime) + " us]";
+    m_main_plot->setAxisTitle( QwtPlot::xBottom, s );
     m_main_plot->setAxisScale( QwtPlot::yLeft, -0.7, 0.7 );
     m_main_plot->setAxisTitle( QwtPlot::yLeft, "signal magnitude [-]" );
     m_main_plot->enableAxis(QwtPlot::yRight,true);
@@ -146,4 +153,43 @@ void MainWindow::actionButtonOption6()
 void MainWindow::actionButtonOption7()
 {
 
+}
+
+void MainWindow::createActions()
+{
+    m_newAction = new QAction(tr("&Info"), this);
+    connect(m_newAction, SIGNAL(triggered()), this, SLOT(showAppInfo()));
+}
+
+void MainWindow::createMenus()
+{
+    m_MenuBar = new QMenuBar(this);
+    m_fileMenu = new QMenu("&Info");
+    m_fileMenu->addAction(m_newAction);
+    m_MenuBar->addMenu(m_fileMenu);
+    setMenuBar(m_MenuBar);
+}
+
+#include <QLabel>
+void MainWindow::showAppInfo()
+{
+    const double sampleTime = 1000.0 / AUDIO_DEV_SAMPLING_FREQ;
+    QString s = "sampling frequency :      " + QString::number(AUDIO_DEV_SAMPLING_FREQ) + " Hz\n";
+    s +=        "                          " + QString::number(sampleTime) + " us per sample\n";
+    s +=        "audio buffer filled in :  " + QString::number(sampleTime * AUDIO_DEV_BUFFER_FRAMES_NBR) + " us\n";
+    s +=        "                          " + QString::number(1000/(sampleTime * AUDIO_DEV_BUFFER_FRAMES_NBR)) + " Hz\n";
+    s +=        "audio server :            " + QString(AUDIO_SERVER) + "\n";
+    s +=        "library used :            " + QString(LIBS_USED) + "\n";
+
+    QLabel * lbl = new QLabel;
+    lbl->setFont( QFont("Monospace", 12) );
+    lbl->setText( s );
+
+    QVBoxLayout *vbl = new QVBoxLayout();
+    vbl->addWidget(lbl);
+
+    m_infoWindow = new QWidget;
+    m_infoWindow->setLayout(vbl);
+    m_infoWindow->resize(320, 240);
+    m_infoWindow->show();
 }
