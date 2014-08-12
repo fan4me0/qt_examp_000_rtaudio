@@ -49,3 +49,6 @@ LIBS += -lpulse-simple -lpulse
 #DEFINES     += __LINUX_ALSA__
 #INCLUDEPATH += /home/franto/builds/libs/stk/stk-4.5.0/include
 #LIBS += -lasound
+
+OTHER_FILES += \
+    README.md
