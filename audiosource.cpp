@@ -106,9 +106,10 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
 
 audioSource::~audioSource()
 {
-      // appl. crash if stream stopped- why?
-//    if ( m_audio_device.isStreamRunning() )
-//      m_audio_device.stopStream();
+    if ( m_audio_device.isStreamRunning() )
+    {
+        m_audio_device.stopStream();
+    }
 }
 
 bool log_buff = false;
@@ -117,7 +118,7 @@ bool store_data = false;
 static int log_iter = 0;
 const int row_nbr = 100;
 static std::vector<std::vector<double>> audio_log( row_nbr );
-const int row_elements = 512;
+const int row_elements = AUDIO_DEV_BUFFER_FRAMES_NBR;
 
 
 void audioSource::storeData( void *inputBuffer )
@@ -125,9 +126,9 @@ void audioSource::storeData( void *inputBuffer )
     if( log_buff == true )
     {
         int iter = 0;
-        for(; iter < row_elements; iter++)
+        for( ; iter < row_elements; iter++)
         {
-            ::audio_log[log_iter].push_back(((double*)inputBuffer)[iter]);
+            ::audio_log[ log_iter ].push_back(((double*)inputBuffer)[iter]);
         }
 
         log_iter++;
@@ -141,8 +142,7 @@ void audioSource::storeData( void *inputBuffer )
 
 void audioSource::fillSignal( QVector<QPointF> & vector )
 {
-    std::lock (foo, boo);
-
+    std::lock ( foo, boo );
     vector = ::m_qpoint_signal;
     foo.unlock();
     boo.unlock();
@@ -154,19 +154,19 @@ void audioSource::storeDataToFile()
     if( store_data == true )
     {
         std::ofstream out_curve;
-        out_curve.open("signal_samples.txt",std::ios::out);
+        out_curve.open( "signal_samples.txt", std::ios::out );
         std::stringstream   ssline;
-        ssline.setf(std::ios::fixed,std::ios::floatfield);
-        ssline.precision(6);
+        ssline.setf( std::ios::fixed, std::ios::floatfield );
+        ssline.precision( 6 );
 
-        for(int iter = 0; iter < row_nbr; iter++)
+        for( int iter = 0; iter < row_nbr; iter++ )
         {
-            for(auto & index: ::audio_log[iter])
+            for( auto & index: ::audio_log[ iter ] )
             {
                 //std::cout << index << std::endl;
                 ssline << index;
                 out_curve << ssline.str() << "\n";
-                ssline.str("") ;
+                ssline.str( "" ) ;
             }
         }
         out_curve.close();

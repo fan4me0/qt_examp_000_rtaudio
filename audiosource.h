@@ -3,6 +3,7 @@
 
 // C++ Standard includes
 #include <vector>
+#include <mutex>
 
 // Qt includes
 #include <QVector>
@@ -21,6 +22,7 @@ public:
     virtual ~audioSource();
     void fillSignal( QVector<QPointF> & buffer );
     void storeDataToFile();
+    //static int signal_iter;
 
 private :
     static volatile bool lock_fill;

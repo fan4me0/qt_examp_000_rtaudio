@@ -5,13 +5,13 @@
 #include "audiosource.h"
 #include "mainwindow.h"
 
-int main(int argc, char *argv[])
+int main( int argc, char *argv[] )
 {
     //audioSource audioInput;
 
-    QApplication a(argc, argv);
+    QApplication a( argc, argv );
     MainWindow w;
-    w.startTimer(5);
+    w.startTimer( 20 );
     w.show();
 
     return a.exec();

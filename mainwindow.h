@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow( QWidget *parent = 0 );
     ~MainWindow();
 
 private Q_SLOTS:
@@ -33,6 +33,7 @@ private Q_SLOTS:
     void showAppInfo();
 
 private:
+    void closeEvent( QCloseEvent * event );
     void createMenus(void);
     void createActions(void);
     void timerEvent(QTimerEvent * timerId );    // override of QObject 'virtual protected'
