@@ -22,15 +22,20 @@ public:
     virtual ~audioSource();
     void fillSignal( QVector<QPointF> & buffer );
     void storeDataToFile();
-    //static int signal_iter;
+    void setLogBuff();
+    bool getLogBuff();
+    void setStoreBuff();
+    void setSaveBuffLog();
 
 private :
+    static bool log_buff;
+    static bool save_buff_log;
     static volatile bool lock_fill;
     static QVector<QPointF>    m_qpoint_signal;
     static std::vector<std::vector<double>> audio_log;
     static int audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                                     double streamTime, RtAudioStreamStatus status, void *data );
-    static void storeData( void * vv );
+    static void logDataInBuff( void * vv );
 
     RtAudio         m_audio_device;
     RtAudio::StreamParameters   m_aud_dev_in_params;

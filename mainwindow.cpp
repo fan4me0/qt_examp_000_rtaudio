@@ -97,6 +97,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     // finally, refresh the plot
     m_main_plot->replot();
 }
+
 void MainWindow:: closeEvent( QCloseEvent * event )
 {
     if( m_infoWindow != nullptr )
@@ -120,21 +121,32 @@ void MainWindow::timerEvent( QTimerEvent * timerId )
     m_main_plot->setCanvasBackground( QColor( Qt::black ) );
 }
 
-extern bool log_buff;
-
 void MainWindow::actionButtonOption1()
 {
-    std::cout << "Started samples logging ..." << std::endl;
-    log_buff = true;
-}
+    if( m_signalSource->getLogBuff() == true )
+    {
+        std::cout << "Logging already started..." << std::endl;
+    }
+    else
+    {
+        std::cout << "Started samples logging ..." << std::endl;
+        m_signalSource->setLogBuff();
+    }
 
-extern bool store_data;
+}
 
 void MainWindow::actionButtonOption2()
 {
-    std::cout << "Started storing data ..." << std::endl;
-    store_data = true;
-    m_signalSource->storeDataToFile();
+    if( m_signalSource->getLogBuff() == true )
+    {
+        std::cout << "Still logging..." << std::endl;
+    }
+    else
+    {
+        std::cout << "Started storing data ..." << std::endl;
+        m_signalSource->setSaveBuffLog();
+        m_signalSource->storeDataToFile();
+    }
 }
 
 void MainWindow::actionButtonOption3()

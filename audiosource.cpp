@@ -13,22 +13,23 @@
 #include "audiosource.h"
 #include "parameters.h"
 
-unsigned int dbg_callback_counter = 0;
-static int signal_iter = 0;
-static QVector<QPointF>    m_qpoint_signal(AUDIO_DEV_BUFFER_FRAMES_NBR);
 
+bool audioSource::log_buff;
+bool audioSource::save_buff_log;
 std::mutex foo, boo;
+
+static int signal_iter = 0;
+static QVector<QPointF>    m_qpoint_signal( AUDIO_DEV_BUFFER_FRAMES_NBR );
+
 
 int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                                 double streamTime, RtAudioStreamStatus status, void *data )
 {
     // Since the number of input and output channels is equal, we can do
     // a simple buffer copy operation here.
-    dbg_callback_counter++;
     if ( status ) std::cout << "Stream over/underflow detected." << std::endl;
 
-    //std::cerr << dbg_callback_counter << "  -----  " << nBufferFrames << std::endl;
-    storeData( inputBuffer );
+    logDataInBuff( inputBuffer );
 
     std::lock (foo, boo);
     for(; signal_iter < AUDIO_DEV_BUFFER_FRAMES_NBR; signal_iter++)
@@ -44,6 +45,8 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
 
 audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
 {
+    log_buff = false;
+    save_buff_log = false;
     if ( m_audio_device.getDeviceCount() < 1 )
     {
         std::cout << "\nNo audio devices found!\n";
@@ -112,17 +115,31 @@ audioSource::~audioSource()
     }
 }
 
-bool log_buff = false;
-bool store_data = false;
 
-static int log_iter = 0;
-const int row_nbr = 100;
-static std::vector<std::vector<double>> audio_log( row_nbr );
 const int row_elements = AUDIO_DEV_BUFFER_FRAMES_NBR;
 
-
-void audioSource::storeData( void *inputBuffer )
+void audioSource::setLogBuff()
 {
+    log_buff = true;
+}
+
+bool audioSource::getLogBuff()
+{
+    return log_buff;
+}
+
+void audioSource::setSaveBuffLog()
+{
+    save_buff_log = true;
+}
+
+const int row_nbr = 2;
+static std::vector<std::vector<double>> audio_log( row_nbr );
+
+void audioSource::logDataInBuff( void *inputBuffer )
+{
+    static int log_iter = 0;
+
     if( log_buff == true )
     {
         int iter = 0;
@@ -134,6 +151,7 @@ void audioSource::storeData( void *inputBuffer )
         log_iter++;
         if( log_iter == row_nbr )
         {
+            log_iter = 0;
             log_buff = false;
             std::cout << "Finished sample logging ..." << std::endl;
         }
@@ -151,7 +169,7 @@ void audioSource::fillSignal( QVector<QPointF> & vector )
 
 void audioSource::storeDataToFile()
 {
-    if( store_data == true )
+    if( save_buff_log == true )
     {
         std::ofstream out_curve;
         out_curve.open( "signal_samples.txt", std::ios::out );
@@ -170,7 +188,7 @@ void audioSource::storeDataToFile()
             }
         }
         out_curve.close();
-        store_data = false;
+        save_buff_log = false;
         std::cout << "Finished storing data ..." << std::endl;
     }
 }
