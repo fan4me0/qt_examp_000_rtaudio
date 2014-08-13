@@ -159,6 +159,11 @@ void MainWindow::actionButtonOption6()
 
 void MainWindow::actionButtonOption7()
 {
+
+}
+
+void MainWindow::releaseResources()
+{
     m_infoWindow = nullptr;
 }
 
@@ -181,11 +186,12 @@ void MainWindow::showAppInfo()
 {
     if( m_infoWindow == nullptr )
     {
-        const double sampleTime = 1000.0 / AUDIO_DEV_SAMPLING_FREQ;
+        const double microsecond = 1000; // display time in us
+        const double sampleTime = microsecond / AUDIO_DEV_SAMPLING_FREQ;
         QString s = "sampling frequency :      " + QString::number( AUDIO_DEV_SAMPLING_FREQ ) + " Hz\n";
         s +=        "                          " + QString::number( sampleTime ) + " us per sample\n";
         s +=        "audio buffer filled in :  " + QString::number( sampleTime * AUDIO_DEV_BUFFER_FRAMES_NBR ) + " us\n";
-        s +=        "                          " + QString::number( 1000.0/(sampleTime * AUDIO_DEV_BUFFER_FRAMES_NBR) ) + " Hz\n";
+        s +=        "                          " + QString::number( microsecond/(sampleTime * AUDIO_DEV_BUFFER_FRAMES_NBR) ) + " Hz\n";
         s +=        "audio server :            " + QString( AUDIO_SERVER ) + "\n";
         s +=        "library used :            " + QString( LIBS_USED ) + "\n";
 
@@ -200,7 +206,7 @@ void MainWindow::showAppInfo()
         m_infoWindow->setLayout( vbl );
         m_infoWindow->resize( 320, 240 );
         m_infoWindow->setAttribute( Qt::WA_DeleteOnClose );
-        connect ( m_infoWindow, SIGNAL( destroyed() ), this, SLOT( actionButtonOption7() ) );
+        connect ( m_infoWindow, SIGNAL( destroyed() ), this, SLOT( releaseResources() ) );
         m_infoWindow->show();
     }
 }

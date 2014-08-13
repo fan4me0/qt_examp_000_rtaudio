@@ -30,6 +30,7 @@ private Q_SLOTS:
     void actionButtonOption5();
     void actionButtonOption6();
     void actionButtonOption7();
+    void releaseResources();
     void showAppInfo();
 
 private:
