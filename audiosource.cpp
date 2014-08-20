@@ -133,7 +133,7 @@ void audioSource::setSaveBuffLog()
     save_buff_log = true;
 }
 
-const int row_nbr = 2;
+const int row_nbr = 200;
 static std::vector<std::vector<double>> audio_log( row_nbr );
 
 void audioSource::logDataInBuff( void *inputBuffer )
@@ -167,29 +167,36 @@ void audioSource::fillSignal( QVector<QPointF> & vector )
     signal_iter = 0;
 }
 
+#include "threadstoredata.h"
+
 void audioSource::storeDataToFile()
 {
-    if( save_buff_log == true )
-    {
-        std::ofstream out_curve;
-        out_curve.open( "signal_samples.txt", std::ios::out );
-        std::stringstream   ssline;
-        ssline.setf( std::ios::fixed, std::ios::floatfield );
-        ssline.precision( 6 );
+    threadStoreData *hello = new threadStoreData();
+    hello->set_pointer( ::audio_log );
+    // QThreadPool takes ownership and deletes 'hello' automatically
+    QThreadPool::globalInstance()->start(hello);
 
-        for( int iter = 0; iter < row_nbr; iter++ )
-        {
-            for( auto & index: ::audio_log[ iter ] )
-            {
-                //std::cout << index << std::endl;
-                ssline << index;
-                out_curve << ssline.str() << "\n";
-                ssline.str( "" ) ;
-            }
-        }
-        out_curve.close();
-        save_buff_log = false;
-        std::cout << "Finished storing data ..." << std::endl;
-    }
+//    if( save_buff_log == true )
+//    {
+//        std::ofstream out_curve;
+//        out_curve.open( "signal_samples.txt", std::ios::out );
+//        std::stringstream   ssline;
+//        ssline.setf( std::ios::fixed, std::ios::floatfield );
+//        ssline.precision( 6 );
+
+//        for( int iter = 0; iter < row_nbr; iter++ )
+//        {
+//            for( auto & index: ::audio_log[ iter ] )
+//            {
+//                //std::cout << index << std::endl;
+//                ssline << index;
+//                out_curve << ssline.str() << "\n";
+//                ssline.str( "" ) ;
+//            }
+//        }
+//        out_curve.close();
+//        save_buff_log = false;
+//        std::cout << "Finished storing data ..." << std::endl;
+//    }
 }
 

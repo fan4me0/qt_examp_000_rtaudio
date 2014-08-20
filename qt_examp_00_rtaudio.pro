@@ -15,12 +15,14 @@ TEMPLATE = app
 SOURCES += main.cpp         \
         mainwindow.cpp      \
         audiosource.cpp     \
-        ../../../../../builds/libs/stk/stk-4.5.0/src/RtAudio.cpp
+        ../../../../../builds/libs/stk/stk-4.5.0/src/RtAudio.cpp \
+    threadstoredata.cpp
 
 HEADERS  += mainwindow.h    \
         audiosource.h       \
         audiosource.h \
-    parameters.h
+    parameters.h \
+    threadstoredata.h
 
 #------------------------------------------------------------
 # Compiler settings

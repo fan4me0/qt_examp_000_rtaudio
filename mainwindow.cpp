@@ -98,7 +98,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     m_main_plot->replot();
 }
 
-void MainWindow:: closeEvent( QCloseEvent * event )
+void MainWindow::closeEvent( QCloseEvent * event )
 {
     if( m_infoWindow != nullptr )
     {
