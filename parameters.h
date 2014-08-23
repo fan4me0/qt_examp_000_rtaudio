@@ -16,6 +16,12 @@ const int AUDIO_DEV_OUT_FISRT_CHANNEL_OFFSET  = 0;
 const int AUDIO_DEV_BUFFER_FRAMES_NBR         = 2048;
 const int AUDIO_DEV_SAMPLING_FREQ             = 44100;
 
+/* number of the vector of vectors i.e :
+nbr_samples_to_store = AUDIO_DEV_BUFFER_FRAMES_NBR * row_nbr
+*/
+const int ROW_NBR = 200;
+
+
 #if defined(__LINUX_PULSE__)
 const char AUDIO_SERVER[] = "__LINUX_PULSE__";
 const char LIBS_USED[] = "-lpulse-simple -lpulse";

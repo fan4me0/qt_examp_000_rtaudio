@@ -22,7 +22,8 @@ HEADERS  += mainwindow.h    \
         audiosource.h       \
         audiosource.h \
     parameters.h \
-    threadstoredata.h
+    threadstoredata.h \
+    timer.h
 
 #------------------------------------------------------------
 # Compiler settings

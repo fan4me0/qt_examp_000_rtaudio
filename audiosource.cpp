@@ -6,6 +6,9 @@
 #include <vector>
 #include <mutex>
 
+// Qt includes
+#include <QThreadPool>
+
 // Stk includes
 #include "RtAudio.h"
 
@@ -133,8 +136,7 @@ void audioSource::setSaveBuffLog()
     save_buff_log = true;
 }
 
-const int row_nbr = 200;
-static std::vector<std::vector<double>> audio_log( row_nbr );
+static std::vector<std::vector<double>> audio_log( ROW_NBR );
 
 void audioSource::logDataInBuff( void *inputBuffer )
 {
@@ -149,7 +151,7 @@ void audioSource::logDataInBuff( void *inputBuffer )
         }
 
         log_iter++;
-        if( log_iter == row_nbr )
+        if( log_iter == ROW_NBR )
         {
             log_iter = 0;
             log_buff = false;
@@ -172,31 +174,8 @@ void audioSource::fillSignal( QVector<QPointF> & vector )
 void audioSource::storeDataToFile()
 {
     threadStoreData *hello = new threadStoreData();
-    hello->set_pointer( ::audio_log );
+    hello->setPointer( ::audio_log );
     // QThreadPool takes ownership and deletes 'hello' automatically
     QThreadPool::globalInstance()->start(hello);
-
-//    if( save_buff_log == true )
-//    {
-//        std::ofstream out_curve;
-//        out_curve.open( "signal_samples.txt", std::ios::out );
-//        std::stringstream   ssline;
-//        ssline.setf( std::ios::fixed, std::ios::floatfield );
-//        ssline.precision( 6 );
-
-//        for( int iter = 0; iter < row_nbr; iter++ )
-//        {
-//            for( auto & index: ::audio_log[ iter ] )
-//            {
-//                //std::cout << index << std::endl;
-//                ssline << index;
-//                out_curve << ssline.str() << "\n";
-//                ssline.str( "" ) ;
-//            }
-//        }
-//        out_curve.close();
-//        save_buff_log = false;
-//        std::cout << "Finished storing data ..." << std::endl;
-//    }
 }
 
