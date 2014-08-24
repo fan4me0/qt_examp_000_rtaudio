@@ -65,7 +65,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     QwtText text( label );
     m_main_plot = new QwtPlot( text, parent );
     m_main_plot->setCanvasBackground( QColor( Qt::black ) );
-    m_main_plot->setAxisScale( QwtPlot::xBottom, 0, (AUDIO_DEV_BUFFER_FRAMES_NBR - 1) );
+    m_main_plot->setAxisScale( QwtPlot::xBottom, 0, ( AUDIO_DEV_BUFFER_FRAMES_NBR - 1 ) );
 
     const double sampleTime = 1000.0 / AUDIO_DEV_SAMPLING_FREQ;
     QString s = "samples [ 1 smpl/" + QString::number( sampleTime ) + " us]";
@@ -75,7 +75,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     m_main_plot->enableAxis( QwtPlot::yRight, true );
     m_main_plot->setAxisScale( QwtPlot::yRight, -0.7, 0.7 );
     m_main_plot->enableAxis( QwtPlot::xTop, true );
-    m_main_plot->setAxisScale( QwtPlot::xTop, 0, AUDIO_DEV_BUFFER_FRAMES_NBR - 1 );
+    m_main_plot->setAxisScale( QwtPlot::xTop, 0, ( AUDIO_DEV_BUFFER_FRAMES_NBR - 1 ) );
 
     QwtPlotGrid *grid = new QwtPlotGrid();
     grid->setPen( QPen( Qt::green, 0.0, Qt::DotLine ) );
@@ -121,6 +121,11 @@ void MainWindow::timerEvent( QTimerEvent * timerId )
     m_main_plot->setCanvasBackground( QColor( Qt::black ) );
 }
 
+/*
+ * Use the button with label 'Option_1' to start collecting the samples. Use
+ * button 'Option_2' to store the collected samples into file in the working
+ * directory.
+ */
 void MainWindow::actionButtonOption1()
 {
     if( m_signalSource->getLogBuff() == true )
@@ -135,6 +140,10 @@ void MainWindow::actionButtonOption1()
 
 }
 
+/*
+ * Use button 'Option_2' to store the collected samples into file in the working
+ * directory.
+ */
 void MainWindow::actionButtonOption2()
 {
     if( m_signalSource->getLogBuff() == true )
@@ -153,6 +162,8 @@ void MainWindow::actionButtonOption3()
 {
     m_signalSource->fillSignal( m_qpoint_signal );
 }
+
+#include "timer.h"
 
 void MainWindow::actionButtonOption4()
 {

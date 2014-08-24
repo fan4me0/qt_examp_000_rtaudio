@@ -17,18 +17,21 @@ void threadStoreData::run()
 
 void threadStoreData::setPointer( std::vector<std::vector<double>> &prt )
 {
+    timer sw( "Create data copy" );
+
     m_ptr = prt;
 }
 
 void threadStoreData::storeData()
 {
-    timer sw;
     std::cout << "Hello from the thread..." << std::endl;
     std::ofstream out_curve;
     out_curve.open( "signal_samples.txt", std::ios::out );
     std::stringstream   ssline;
     ssline.setf( std::ios::fixed, std::ios::floatfield );
     ssline.precision( 6 );
+
+    timer sw( "Store samples into file" );
 
     for( int iter = 0; iter < ROW_NBR; iter++ )
     {
