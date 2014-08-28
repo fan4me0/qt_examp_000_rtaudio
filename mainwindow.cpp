@@ -70,10 +70,10 @@ MainWindow::MainWindow( QWidget *parent ) :
     const double sampleTime = 1000.0 / AUDIO_DEV_SAMPLING_FREQ;
     QString s = "samples [ 1 smpl/" + QString::number( sampleTime ) + " us]";
     m_main_plot->setAxisTitle( QwtPlot::xBottom, s );
-    m_main_plot->setAxisScale( QwtPlot::yLeft, -0.7, 0.7 );
+    m_main_plot->setAxisScale( QwtPlot::yLeft, -1., 1.0 );
     m_main_plot->setAxisTitle( QwtPlot::yLeft, "signal magnitude [-]" );
     m_main_plot->enableAxis( QwtPlot::yRight, true );
-    m_main_plot->setAxisScale( QwtPlot::yRight, -0.7, 0.7 );
+    m_main_plot->setAxisScale( QwtPlot::yRight, -1.0, 1.0 );
     m_main_plot->enableAxis( QwtPlot::xTop, true );
     m_main_plot->setAxisScale( QwtPlot::xTop, 0, ( AUDIO_DEV_BUFFER_FRAMES_NBR - 1 ) );
 
@@ -162,8 +162,6 @@ void MainWindow::actionButtonOption3()
 {
     m_signalSource->fillSignal( m_qpoint_signal );
 }
-
-#include "timer.h"
 
 void MainWindow::actionButtonOption4()
 {
