@@ -38,7 +38,7 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
     for(; signal_iter < AUDIO_DEV_BUFFER_FRAMES_NBR; signal_iter++)
     {
         ::m_qpoint_signal[signal_iter] = QPointF( signal_iter, ((double*)inputBuffer)[signal_iter] );
-        //::m_qpoint_signal[signal_iter] = QPointF( signal_iter, ((double*)outputBuffer)[signal_iter] );
+        //((double*)outputBuffer)[signal_iter] = ((double*)inputBuffer)[signal_iter];
     }
     foo.unlock();
     boo.unlock();
@@ -92,8 +92,14 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
                                    &m_options );
 
         // second variant is a must for duplex mode
-//         m_audio_device.openStream( &m_aud_dev_out_params, NULL, FORMAT, m_sampling_freq,
-//                                    &m_audio_buffer_frames, &audio_buffer_full, (void *)&m_audio_buffer_bytes, &m_options );
+//        m_audio_device.openStream( &m_aud_dev_out_params,
+//                                   &m_aud_dev_in_params,
+//                                   FORMAT,
+//                                   m_sampling_freq,
+//                                   &m_audio_buffer_frames,
+//                                   &audio_buffer_full,
+//                                   (void *)&m_audio_buffer_bytes,
+//                                   &m_options );
     }
     catch ( RtAudioError& e ) {
         std::cout << '\n' << e.getMessage() << '\n' << std::endl;
