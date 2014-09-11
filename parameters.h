@@ -4,8 +4,10 @@
 //----------------------------------------------------------------------------------------------
 // Parameters for audioSource.cpp
 //----------------------------------------------------------------------------------------------
-typedef double  MY_TYPE;
-#define FORMAT RTAUDIO_FLOAT64
+#define SAMPLE_FORMAT RTAUDIO_FLOAT64
+#define SAMPLE_FORMAT_TYPE double
+#define SAMPLE_FORMAT_FLOAT64
+
 
 // !!! by default the data sampled in the OS buffer from signal input (e.g. microphone)
 // are interleaved that is for channels = 2 samples that are fed into fft has to be

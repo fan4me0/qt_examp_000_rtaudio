@@ -35,8 +35,8 @@ MainWindow::MainWindow( QWidget *parent ) :
 
     //------------buttons----------------------------
     QHBoxLayout * hLoutOptionButtons = new QHBoxLayout( );
-    QPushButton * buttonOption1 = new QPushButton( "Option_1" );
-    QPushButton * buttonOption2 = new QPushButton( "Option_2" );
+    QPushButton * buttonOption1 = new QPushButton( "Record samples" );
+    QPushButton * buttonOption2 = new QPushButton( "Store samples" );
     QPushButton * buttonOption3 = new QPushButton( "Option_3" );
     QPushButton * buttonOption4 = new QPushButton( "Option_4" );
     QPushButton * buttonOption5 = new QPushButton( "Option_5" );

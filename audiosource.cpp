@@ -9,12 +9,13 @@
 // Qt includes
 #include <QThreadPool>
 
-// Stk includes
+// RtAudio includes
 #include "RtAudio.h"
 
 // App includes
 #include "audiosource.h"
 #include "parameters.h"
+#include "threadstoredata.h"
 
 
 bool audioSource::log_buff;
@@ -22,8 +23,11 @@ bool audioSource::save_buff_log;
 std::mutex foo, boo;
 
 static int signal_iter = 0;
-static QVector<QPointF>    m_qpoint_signal( AUDIO_DEV_BUFFER_FRAMES_NBR );
-
+#if defined(SAMPLE_FORMAT_FLOAT64)
+    static QVector<QPointF>    m_qpoint_signal( AUDIO_DEV_BUFFER_FRAMES_NBR );
+#else
+    #error Error: define sample fotmat in parameters.h.
+#endif
 
 int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                                 double streamTime, RtAudioStreamStatus status, void *data )
@@ -37,8 +41,8 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
     std::lock (foo, boo);
     for(; signal_iter < AUDIO_DEV_BUFFER_FRAMES_NBR; signal_iter++)
     {
-        ::m_qpoint_signal[signal_iter] = QPointF( signal_iter, ((double*)inputBuffer)[signal_iter] );
-        //((double*)outputBuffer)[signal_iter] = ((double*)inputBuffer)[signal_iter];
+        ::m_qpoint_signal[signal_iter] = QPointF( signal_iter, ((SAMPLE_FORMAT_TYPE*)inputBuffer)[signal_iter] );
+        //((SAMPLE_FORMAT_TYPE*)outputBuffer)[signal_iter] = ((SAMPLE_FORMAT_TYPE*)inputBuffer)[signal_iter];
     }
     foo.unlock();
     boo.unlock();
@@ -84,7 +88,7 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
         // first variant for input only mode
         m_audio_device.openStream( NULL,
                                    &m_aud_dev_in_params,
-                                   FORMAT,
+                                   SAMPLE_FORMAT,
                                    m_sampling_freq,
                                    &m_audio_buffer_frames,
                                    &audio_buffer_full,
@@ -94,7 +98,7 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
         // second variant is a must for duplex mode
 //        m_audio_device.openStream( &m_aud_dev_out_params,
 //                                   &m_aud_dev_in_params,
-//                                   FORMAT,
+//                                   SAMPLE_FORMAT,
 //                                   m_sampling_freq,
 //                                   &m_audio_buffer_frames,
 //                                   &audio_buffer_full,
@@ -105,7 +109,7 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
         std::cout << '\n' << e.getMessage() << '\n' << std::endl;
         exit( 1 );
     }
-    m_audio_buffer_bytes = m_audio_buffer_frames * m_aud_dev_in_params.nChannels * sizeof( MY_TYPE );
+    m_audio_buffer_bytes = m_audio_buffer_frames * m_aud_dev_in_params.nChannels * sizeof( SAMPLE_FORMAT_TYPE );
 
     // start audio stream
     try {
@@ -174,8 +178,6 @@ void audioSource::fillSignal( QVector<QPointF> & vector )
     boo.unlock();
     signal_iter = 0;
 }
-
-#include "threadstoredata.h"
 
 void audioSource::storeDataToFile()
 {

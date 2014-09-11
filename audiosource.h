@@ -9,7 +9,7 @@
 #include <QVector>
 #include <QPointF>
 
-// Stk includes
+// RtAudio includes
 #include "RtAudio.h"
 
 // App includes
