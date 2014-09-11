@@ -12,15 +12,8 @@ TEMPLATE = app
 #------------------------------------------------------------
 # RtAudio library settings
 RTAUDIO_PATH        = /home/franto/builds/libs/rtaudio/rtaudio-4.1.1
-RTAUDIO_PATH_INC    = $${RTAUDIO_PATH}/rtaudio-4.1.1
-
-#------------------------------------------------------------
-# STK library settings
-STK_PATH        = /home/franto/builds/libs/stk/stk-4.5.0
-STK_PATH_INC    = $${STK_PATH}/include
-STK_PATH_SRC    = $${STK_PATH}/src
-STK_PATH_SRC_INC = $${STK_PATH}/src/include
-STK_PATH_LIB    = $${STK_PATH}/src
+RTAUDIO_PATH_INC    = $${RTAUDIO_PATH}
+RTAUDIO_PATH_INC2   = $${RTAUDIO_PATH}/include
 
 DEFINES     += __LINUX_PULSE__
 INCLUDEPATH += $${STK_PATH_INC}
@@ -33,6 +26,14 @@ LIBS        += -lpulse-simple -lpulse
 #DEFINES     += __LINUX_ALSA__
 #INCLUDEPATH += $${STK_PATH_INC}
 #LIBS        += -lasound
+
+#------------------------------------------------------------
+# STK library settings
+STK_PATH        = /home/franto/builds/libs/stk/stk-4.5.0
+STK_PATH_INC    = $${STK_PATH}/include
+STK_PATH_SRC    = $${STK_PATH}/src
+STK_PATH_SRC_INC = $${STK_PATH}/src/include
+STK_PATH_LIB    = $${STK_PATH}/src
 
 #------------------------------------------------------------
 # Qwt library settings
