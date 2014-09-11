@@ -16,15 +16,15 @@ RTAUDIO_PATH_INC    = $${RTAUDIO_PATH}
 RTAUDIO_PATH_INC2   = $${RTAUDIO_PATH}/include
 
 DEFINES     += __LINUX_PULSE__
-INCLUDEPATH += $${STK_PATH_INC}
+INCLUDEPATH += $${RTAUDIO_PATH_INC}
 LIBS        += -lpulse-simple -lpulse
 
 #DEFINES     += __UNIX_JACK__
-#INCLUDEPATH += $${STK_PATH_INC}
+#INCLUDEPATH += $${RTAUDIO_PATH_INC}
 #LIBS        += -lasound -ljack
 
 #DEFINES     += __LINUX_ALSA__
-#INCLUDEPATH += $${STK_PATH_INC}
+#INCLUDEPATH += $${RTAUDIO_PATH_INC}
 #LIBS        += -lasound
 
 #------------------------------------------------------------
