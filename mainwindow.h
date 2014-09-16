@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <memory>
+
 // Qt includes
 #include <QMainWindow>
 #include <QVector>
@@ -38,7 +40,7 @@ private:
     void createMenus(void);
     void createActions(void);
     void timerEvent(QTimerEvent * timerId );    // override of QObject 'virtual protected'
-    audioSource     * m_signalSource;
+    std::unique_ptr<audioSource> m_signalSource;
     QwtPlot         * m_main_plot;
     QwtPlotCurve    * m_main_curve;
     QVector<QPointF>    m_qpoint_signal;

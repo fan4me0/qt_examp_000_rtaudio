@@ -1,5 +1,6 @@
 // C++ Standard includes
 #include <iostream>
+#include <unistd.h>  // getpid()
 
 // Qt includes
 #include <qlayout.h>
@@ -16,14 +17,9 @@
 #include "parameters.h"
 
 MainWindow::MainWindow( QWidget *parent ) :
-    QMainWindow( parent ), m_infoWindow( nullptr )
+    QMainWindow( parent ), m_infoWindow( nullptr ), m_signalSource( new audioSource )
 {
-    for(int i = 0; i < 1024; i++)
-    {
-        m_qpoint_signal.push_back( QPointF( i, 0) );
-    }
-
-    m_signalSource = new audioSource;
+    setWindowTitle(QString("qt_examp_000_rtaudio (pid " + QString::number( getpid() ) + ")"));
 
     setCentralWidget( new QWidget( this ) );
     QVBoxLayout *layout = new QVBoxLayout;
@@ -109,7 +105,6 @@ void MainWindow::closeEvent( QCloseEvent * event )
 
 MainWindow::~MainWindow()
 {
-    delete m_signalSource;
 }
 
 void MainWindow::timerEvent( QTimerEvent * timerId )
