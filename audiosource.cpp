@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <mutex>
+#include <unistd.h>  // getpid()
 
 // Qt includes
 #include <QThreadPool>
@@ -37,6 +38,8 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
     if ( status ) std::cout << "Stream over/underflow detected." << std::endl;
 
     logDataInBuff( inputBuffer );
+
+    if ( status ) std::cout << "Stream over/underflow detected." << std::endl;
 
     std::lock (foo, boo);
     for(; signal_iter < AUDIO_DEV_BUFFER_FRAMES_NBR; signal_iter++)
@@ -82,6 +85,9 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
 
     m_aud_dev_out_params.nChannels = AUDIO_DEV_CHANNEL_NBR;
     m_aud_dev_out_params.firstChannel = AUDIO_DEV_OUT_FISRT_CHANNEL_OFFSET;
+
+    // set unique name to recognize multiple instances
+    m_options.streamName = "qt_examp_000_rtaudio (pid " + std::to_string( getpid() ) + ")";
 
     try {
         // !!! if want to use input and output and one of them is aquired from duplex device, second one has to be as well
