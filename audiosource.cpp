@@ -6,6 +6,9 @@
 #include <vector>
 #include <mutex>
 #include <unistd.h>  // getpid()
+#if defined(__UNIX_JACK__)
+    #include <jack/jack.h>
+#endif
 
 // Qt includes
 #include <QThreadPool>
@@ -55,6 +58,7 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
 
 audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
 {
+
     log_buff = false;
     save_buff_log = false;
     if ( m_audio_device.getDeviceCount() < 1 )
@@ -124,6 +128,12 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
     catch ( RtAudioError& e ) {
         std::cout << '\n' << e.getMessage() << '\n' << std::endl;
     }
+
+#if defined(__UNIX_JACK__)
+    std::cout << "Number of frames/period in JACK is: "
+              << jack_get_buffer_size( (jack_client_t*) & (m_options.streamName) )
+              << std::endl;
+#endif
 }
 
 audioSource::~audioSource()
