@@ -2,10 +2,10 @@
 #define QT_GLOBAL_PARAM_H
 
 //----------------------------------------------------------------------------------------------
-// Parameters for audioSource.cpp
+// Global parameters
 //----------------------------------------------------------------------------------------------
-#define SAMPLE_FORMAT RTAUDIO_FLOAT64
-#define SAMPLE_FORMAT_TYPE double
+#define SAMPLE_FORMAT           RTAUDIO_FLOAT64
+#define SAMPLE_FORMAT_TYPE      double
 #define SAMPLE_FORMAT_FLOAT64
 
 
@@ -35,6 +35,8 @@ const char LIBS_USED[] = "-lpulse-simple -lpulse";
         #if defined(__LINUX_ALSA__)
         const char AUDIO_SERVER[] = "__LINUX_ALSA__";
         const char LIBS_USED[] = "-lasound";
+        #else
+            #error Define audio interface in makefile via one of the __LINUX_PULSE__, __UNIX_JACK__ or __LINUX_ALSA__ macro.
         #endif  // defined(__LINUX_ALSA__)
     #endif  // defined(__UNIX_JACK__)
 #endif  // defined(__LINUX_PULSE__)
