@@ -71,4 +71,5 @@ HEADERS  += mainwindow.h    \
 #------------------------------------------------------------
 # Other files
 OTHER_FILES += \
-    README.md
+    README.md \
+    .gitignore
