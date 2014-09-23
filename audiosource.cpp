@@ -36,10 +36,11 @@ static int signal_iter = 0;
 int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                                 double streamTime, RtAudioStreamStatus status, void *data )
 {
+    // via '*data' parameter possible to recognize audio stream-callback relation
+    //std::cout << static_cast<RtAudio::StreamOptions*>(data)->streamName << std::endl;
+
     // Since the number of input and output channels is equal, we can do
     // a simple buffer copy operation here.
-    if ( status ) std::cout << "Stream over/underflow detected." << std::endl;
-
     logDataInBuff( inputBuffer );
 
     if ( status ) std::cout << "Stream over/underflow detected." << std::endl;
@@ -56,9 +57,8 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
     return 0;
 }
 
-audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
+audioSource::audioSource( unsigned int sampl_freq ) : m_sampling_freq( sampl_freq )
 {
-
     log_buff = false;
     save_buff_log = false;
     if ( m_audio_device.getDeviceCount() < 1 )
@@ -91,35 +91,34 @@ audioSource::audioSource(unsigned int sampl_freq) : m_sampling_freq(sampl_freq)
     m_aud_dev_out_params.firstChannel = AUDIO_DEV_OUT_FISRT_CHANNEL_OFFSET;
 
     // set unique name to recognize multiple instances
-    m_options.streamName = "qt_examp_000_rtaudio (pid " + std::to_string( getpid() ) + ")";
+    m_options.streamName = "pid_" + std::to_string( getpid() ) + "_stream_0";
 
     try {
         // !!! if want to use input and output and one of them is aquired from duplex device, second one has to be as well
         // first variant for input only mode
-        m_audio_device.openStream( NULL,
-                                   &m_aud_dev_in_params,
-                                   SAMPLE_FORMAT,
-                                   m_sampling_freq,
-                                   &m_audio_buffer_frames,
-                                   &audio_buffer_full,
-                                   (void *)&m_audio_buffer_bytes,
-                                   &m_options );
+        m_audio_device.openStream( nullptr,                // RtAudio::StreamParameters for out
+                                   &m_aud_dev_in_params,   // RtAudio::StreamParameters for in
+                                   SAMPLE_FORMAT,          // RtAudioFormat
+                                   m_sampling_freq,        // unsigned int sampleRate
+                                   &m_audio_buffer_frames, // unsigned int *bufferFrames
+                                   &audio_buffer_full,     // RtAudioCallback
+                                   &m_options,             // void *userData = NULL
+                                   &m_options  );          // RtAudio::StreamOptions *options = NULL
 
         // second variant is a must for duplex mode
-//        m_audio_device.openStream( &m_aud_dev_out_params,
-//                                   &m_aud_dev_in_params,
-//                                   SAMPLE_FORMAT,
-//                                   m_sampling_freq,
-//                                   &m_audio_buffer_frames,
-//                                   &audio_buffer_full,
-//                                   (void *)&m_audio_buffer_bytes,
-//                                   &m_options );
+//        m_audio_device.openStream( &m_aud_dev_out_params,  // RtAudio::StreamParameters for out
+//                                   &m_aud_dev_in_params,   // RtAudio::StreamParameters for in
+//                                   SAMPLE_FORMAT,          // RtAudioFormat
+//                                   m_sampling_freq,        // unsigned int sampleRate
+//                                   &m_audio_buffer_frames, // unsigned int *bufferFrames
+//                                   &audio_buffer_full,     // RtAudioCallback
+//                                   &m_options,             // void *userData = NULL
+//                                   &m_options );           // RtAudio::StreamOptions *options = NULL
     }
     catch ( RtAudioError& e ) {
         std::cout << '\n' << e.getMessage() << '\n' << std::endl;
         exit( 1 );
     }
-    m_audio_buffer_bytes = m_audio_buffer_frames * m_aud_dev_in_params.nChannels * sizeof( SAMPLE_FORMAT_TYPE );
 
     // start audio stream
     try {
@@ -197,9 +196,8 @@ void audioSource::fillSignal( QVector<QPointF> & vector )
 
 void audioSource::storeDataToFile()
 {
-    threadStoreData *hello = new threadStoreData();
-    hello->setPointer( ::audio_log );
-    // QThreadPool takes ownership and deletes 'hello' automatically
-    QThreadPool::globalInstance()->start(hello);
+    threadStoreData *threadd = new threadStoreData();
+    threadd->setPointer( ::audio_log );
+    // QThreadPool takes ownership and deletes 'threadd' automatically
+    QThreadPool::globalInstance()->start( threadd );
 }
-
