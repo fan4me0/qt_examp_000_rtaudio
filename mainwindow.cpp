@@ -17,7 +17,7 @@
 #include "parameters.h"
 
 MainWindow::MainWindow( QWidget *parent ) :
-    QMainWindow( parent ), m_infoWindow( nullptr ), m_signalSource( new audioSource )
+    QMainWindow( parent ), m_signalSource( new audioSource ), m_infoWindow( nullptr )
 {
     setWindowTitle(QString("qt_examp_000_rtaudio (pid " + QString::number( getpid() ) + ")"));
 
