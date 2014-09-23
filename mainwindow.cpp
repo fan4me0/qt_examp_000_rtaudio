@@ -34,7 +34,7 @@ MainWindow::MainWindow( QWidget *parent ) :
     QPushButton * buttonOption1 = new QPushButton( "Record samples" );
     QPushButton * buttonOption2 = new QPushButton( "Store samples" );
     QPushButton * buttonOption3 = new QPushButton( "Option_3" );
-    QPushButton * buttonOption4 = new QPushButton( "Option_4" );
+    QPushButton * buttonOption4 = new QPushButton( "Start/stop stats" );
     QPushButton * buttonOption5 = new QPushButton( "Option_5" );
     QPushButton * buttonOption6 = new QPushButton( "Option_6" );
     QPushButton * buttonOption7 = new QPushButton( "Option_7" );
@@ -160,7 +160,7 @@ void MainWindow::actionButtonOption3()
 
 void MainWindow::actionButtonOption4()
 {
-
+    m_signalSource->statTimeToogle();
 }
 
 void MainWindow::actionButtonOption5()
