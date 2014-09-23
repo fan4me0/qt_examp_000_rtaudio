@@ -26,15 +26,18 @@ public:
     bool getLogBuff();
     void setStoreBuff();
     void setSaveBuffLog();
+    void statTimeToogle();
 
 private :
     static bool log_buff;
     static bool save_buff_log;
+    static bool m_stat_time;
     static volatile bool lock_fill;
     static QVector<QPointF>    m_qpoint_signal;
     static std::vector<std::vector<double>> audio_log;
     static int audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                                     double streamTime, RtAudioStreamStatus status, void *data );
+    static void statTime();
     static void logDataInBuff( void * vv );
 
     RtAudio         m_audio_device;

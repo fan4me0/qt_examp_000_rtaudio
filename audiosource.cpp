@@ -6,6 +6,8 @@
 #include <vector>
 #include <mutex>
 #include <unistd.h>  // getpid()
+#include <chrono>
+
 #if defined(__UNIX_JACK__)
     #include <jack/jack.h>
 #endif
@@ -25,6 +27,7 @@
 bool audioSource::log_buff;
 bool audioSource::save_buff_log;
 std::mutex foo, boo;
+bool audioSource::m_stat_time = false;
 
 static int signal_iter = 0;
 #if defined(SAMPLE_FORMAT_FLOAT64)
@@ -36,6 +39,8 @@ static int signal_iter = 0;
 int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                                 double streamTime, RtAudioStreamStatus status, void *data )
 {
+    statTime();  // start to print callback stats to stdout via button 'Start/stop stat'
+
     // via '*data' parameter possible to recognize audio stream-callback relation
     //std::cout << static_cast<RtAudio::StreamOptions*>(data)->streamName << std::endl;
 
@@ -55,6 +60,42 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
     boo.unlock();
 
     return 0;
+}
+
+void audioSource::statTime()
+{
+    namespace ns_chr = std::chrono;
+    static ns_chr::high_resolution_clock::time_point t1;
+    static ns_chr::high_resolution_clock::time_point t2;
+    static int nbr_call = 0;
+    static ns_chr::duration<double> time_span_sum{0};
+
+    t2 = ns_chr::high_resolution_clock::now();
+
+    if( m_stat_time == true )
+    {
+        nbr_call++;
+        ns_chr::duration<double> time_span = t2 - t1;
+        time_span_sum += time_span;
+        std::cout << "Average callback period is : " << time_span_sum.count()/nbr_call<< " s" << std::endl;
+        //std::cout << nbr_call << " : " << duration<double,std::milli>(time_span).count() << " ms" << std::endl;
+        std::cout << nbr_call << " : " << time_span.count() << " s" << std::endl;
+    }
+    else
+    {
+        nbr_call = 0;
+        time_span_sum = ns_chr::high_resolution_clock::duration::zero();
+    }
+
+    t1 = t2;
+}
+
+void audioSource::statTimeToogle()
+{
+    if( m_stat_time == true )
+        m_stat_time = false;
+    else
+        m_stat_time = true;
 }
 
 audioSource::audioSource( unsigned int sampl_freq ) : m_sampling_freq( sampl_freq )
