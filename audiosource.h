@@ -42,7 +42,6 @@ private :
     RtAudio::StreamParameters   m_aud_dev_out_params;
     RtAudio::StreamOptions      m_options;
     unsigned int    m_audio_buffer_frames;      // number of elements of size e.g. double
-    unsigned int    m_audio_buffer_bytes;       // number of bytes in buffer i.e. 'm_audio_buffer_frames * sizeof(double)'
     unsigned int    m_sampling_freq;
 };
 
