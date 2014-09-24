@@ -25,8 +25,6 @@ class audioSource
 public:
     audioSource(unsigned int sampl_freq = AUDIO_DEV_SAMPLING_FREQ);
     virtual ~audioSource();
-    void processData( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-                      double streamTime, RtAudioStreamStatus status, void *data );
     void fillSignal( QVector<QPointF> & buffer );
     void storeDataToFile();
     void setLogBuff();
@@ -36,6 +34,11 @@ public:
     void statTimeToogle();
 
 private :
+    static int audioBufferStream0( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+                                   double streamTime, RtAudioStreamStatus status, void *data );
+    void processData( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+                      double streamTime, RtAudioStreamStatus status, void *data );
+
     static QVector<audioSource *>    m_stream_list;
     std::mutex foo, boo;
     bool log_buff;
@@ -48,8 +51,6 @@ private :
         #error Error: define sample fotmat in parameters.h.
     #endif
     std::vector<std::vector<double>> audio_log;
-    static int audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-                                    double streamTime, RtAudioStreamStatus status, void *data );
     void statTime();
     void logDataInBuff( void * vv );
 
