@@ -14,6 +14,7 @@
 
 // Qt includes
 #include <QThreadPool>
+#include <QVector>
 
 // RtAudio includes
 #include "RtAudio.h"
@@ -23,23 +24,21 @@
 #include "parameters.h"
 #include "threadstoredata.h"
 
-
-bool audioSource::log_buff;
-bool audioSource::save_buff_log;
-std::mutex foo, boo;
-bool audioSource::m_stat_time = false;
-
-static int signal_iter = 0;
-#if defined(SAMPLE_FORMAT_FLOAT64)
-    static QVector<QPointF>    m_qpoint_signal( AUDIO_DEV_BUFFER_FRAMES_NBR );
-#else
-    #error Error: define sample fotmat in parameters.h.
-#endif
+// list of the audio streams
+QVector<audioSource *> audioSource::m_stream_list;
 
 int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-                                double streamTime, RtAudioStreamStatus status, void *data )
+                                    double streamTime, RtAudioStreamStatus status, void *data )
 {
-    statTime();  // start to print callback stats to stdout via button 'Start/stop stat'
+    m_stream_list[audioSource::STREAM_0]->processData( outputBuffer, inputBuffer, nBufferFrames,
+                                                       streamTime, status, data );
+    return 0;
+}
+
+void audioSource::processData( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+                               double streamTime, RtAudioStreamStatus status, void *data )
+{
+    statTime();   // start to print callback stats to stdout via button 'Start/stop stat'
 
     // via '*data' parameter possible to recognize audio stream-callback relation
     //std::cout << static_cast<RtAudio::StreamOptions*>(data)->streamName << std::endl;
@@ -51,15 +50,13 @@ int audioSource::audio_buffer_full( void *outputBuffer, void *inputBuffer, unsig
     if ( status ) std::cout << "Stream over/underflow detected." << std::endl;
 
     std::lock (foo, boo);
-    for(; signal_iter < AUDIO_DEV_BUFFER_FRAMES_NBR; signal_iter++)
+    for(int signal_iter = 0; signal_iter < AUDIO_DEV_BUFFER_FRAMES_NBR; ++signal_iter)
     {
-        ::m_qpoint_signal[signal_iter] = QPointF( signal_iter, ((SAMPLE_FORMAT_TYPE*)inputBuffer)[signal_iter] );
+        m_qpoint_signal[signal_iter] = QPointF( signal_iter, ((SAMPLE_FORMAT_TYPE*)inputBuffer)[signal_iter] );
         //((SAMPLE_FORMAT_TYPE*)outputBuffer)[signal_iter] = ((SAMPLE_FORMAT_TYPE*)inputBuffer)[signal_iter];
     }
     foo.unlock();
     boo.unlock();
-
-    return 0;
 }
 
 void audioSource::statTime()
@@ -98,10 +95,12 @@ void audioSource::statTimeToogle()
         m_stat_time = true;
 }
 
-audioSource::audioSource( unsigned int sampl_freq ) : m_sampling_freq( sampl_freq )
+audioSource::audioSource( unsigned int sampl_freq ) : log_buff( false ), save_buff_log( false ),
+                                                      m_stat_time( false ), m_qpoint_signal( AUDIO_DEV_BUFFER_FRAMES_NBR ),
+                                                      audio_log( ROW_NBR ), m_sampling_freq( sampl_freq )
 {
-    log_buff = false;
-    save_buff_log = false;
+    m_stream_list.push_back( this );
+
     if ( m_audio_device.getDeviceCount() < 1 )
     {
         std::cout << "\nNo audio devices found!\n";
@@ -133,6 +132,7 @@ audioSource::audioSource( unsigned int sampl_freq ) : m_sampling_freq( sampl_fre
 
     // set unique name to recognize multiple instances
     m_options.streamName = "pid_" + std::to_string( getpid() ) + "_stream_0";
+    m_stream_name = m_options.streamName;
 
     try {
         // !!! if want to use input and output and one of them is aquired from duplex device, second one has to be as well
@@ -202,8 +202,6 @@ void audioSource::setSaveBuffLog()
     save_buff_log = true;
 }
 
-static std::vector<std::vector<double>> audio_log( ROW_NBR );
-
 void audioSource::logDataInBuff( void *inputBuffer )
 {
     static int log_iter = 0;
@@ -213,7 +211,7 @@ void audioSource::logDataInBuff( void *inputBuffer )
         int iter = 0;
         for( ; iter < row_elements; iter++)
         {
-            ::audio_log[ log_iter ].push_back(((double*)inputBuffer)[iter]);
+            audio_log[ log_iter ].push_back(((double*)inputBuffer)[iter]);
         }
 
         log_iter++;
@@ -229,16 +227,15 @@ void audioSource::logDataInBuff( void *inputBuffer )
 void audioSource::fillSignal( QVector<QPointF> & vector )
 {
     std::lock ( foo, boo );
-    vector = ::m_qpoint_signal;
+    vector = m_qpoint_signal;
     foo.unlock();
     boo.unlock();
-    signal_iter = 0;
 }
 
 void audioSource::storeDataToFile()
 {
     threadStoreData *threadd = new threadStoreData();
-    threadd->setPointer( ::audio_log );
+    threadd->setPointer( audio_log );
     // QThreadPool takes ownership and deletes 'threadd' automatically
     QThreadPool::globalInstance()->start( threadd );
 }

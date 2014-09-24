@@ -17,9 +17,16 @@
 
 class audioSource
 {
+    enum stream_index
+    {
+        STREAM_0,
+        STREAM_1
+    };
 public:
     audioSource(unsigned int sampl_freq = AUDIO_DEV_SAMPLING_FREQ);
     virtual ~audioSource();
+    void processData( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+                      double streamTime, RtAudioStreamStatus status, void *data );
     void fillSignal( QVector<QPointF> & buffer );
     void storeDataToFile();
     void setLogBuff();
@@ -29,16 +36,22 @@ public:
     void statTimeToogle();
 
 private :
-    static bool log_buff;
-    static bool save_buff_log;
-    static bool m_stat_time;
+    static QVector<audioSource *>    m_stream_list;
+    std::mutex foo, boo;
+    bool log_buff;
+    bool save_buff_log;
+    bool m_stat_time;
     static volatile bool lock_fill;
-    static QVector<QPointF>    m_qpoint_signal;
-    static std::vector<std::vector<double>> audio_log;
+    #if defined(SAMPLE_FORMAT_FLOAT64)
+        QVector<QPointF>    m_qpoint_signal;
+    #else
+        #error Error: define sample fotmat in parameters.h.
+    #endif
+    std::vector<std::vector<double>> audio_log;
     static int audio_buffer_full( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
                                     double streamTime, RtAudioStreamStatus status, void *data );
-    static void statTime();
-    static void logDataInBuff( void * vv );
+    void statTime();
+    void logDataInBuff( void * vv );
 
     RtAudio         m_audio_device;
     RtAudio::StreamParameters   m_aud_dev_in_params;
@@ -46,6 +59,7 @@ private :
     RtAudio::StreamOptions      m_options;
     unsigned int    m_audio_buffer_frames;      // number of elements of size e.g. double
     unsigned int    m_sampling_freq;
+    std::string     m_stream_name;
 };
 
 #endif // AUDIOSOURCE_H
